@@ -356,7 +356,7 @@ void Test_Mode(void) {
 						delay_ms(10);
 					}
           Solenoid_Valve_Control(SOL_ON, SOL_PROX);
-					delay_ms(200);
+					delay_ms(500);
 					
 					// 최대값과 최소값 찾기 (open)
 					int16_t openMaxValue, openMinValue;

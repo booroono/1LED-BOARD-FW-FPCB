@@ -23,7 +23,8 @@
 #include "tws_test.h"
 #include "usart.h"
 
-#define FW_VER 			131
+#define FW_VER 			132
+// Ver 1.32 : FPCB 프록시 Closed 측정 시, 솔레노이드가 작동한 후 500ms 대기
 // Ver 1.31 : Prox 센서 클락 보정 설정 추가, 평균화 처리 설정 추가, 온도 보정 설정 추가가
 // Ver 1.30 : Prox 최대값 1개, 최소값 1개 빼고 13개 측정 후 평균 값 
 // Ver 1.29 : Prox 측정 횟수 15회로 변경
