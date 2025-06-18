@@ -1,0 +1,146 @@
+/*
+ * drv_proximity_sensor.c
+ *
+ * Created: 2025-04-09 오전 12:35:39
+ *  Author: bruno
+ */ 
+
+#include "drv_proximity_sensor.h"
+
+prox_sensor_result_t proxSensorResult = {0,};
+
+void Prox_Sensor_On(void) {						// activate adc
+	uint8_t buffer[2] = {0x80, 0x1};
+	
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+}
+
+uint8_t Prox_Sensor_Info_Read(void) {		// device id read
+	uint8_t reg = 0x92;
+	uint8_t buffer = 0;
+
+	if(io_write(I2C_io, &reg, 1) < 0) {
+		i2cErrCount++;
+	}
+	if(io_read(I2C_io, &buffer, 1) < 0) {
+		i2cErrCount++;
+	}
+
+	return buffer;
+}
+
+void Prox_Sensor_Test_Setting(void) {				// test configuration
+	uint8_t buffer[2] = {0,};
+
+	buffer[0] = 0xA9; buffer[1] = 0x5;								// PWTIME
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x8C; buffer[1] = 0x03;							// Proximity interrupt persistence filters
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x8E; buffer[1] = 0x4;							// Proximity configuration zero
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x8F; buffer[1] = 0x45;							// Proximity configuration one
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x88; buffer[1] = 0x59;								// Proximity interrupt low threshold low byte
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x89; buffer[1] = 0x1;								// Proximity interrupt low threshold high byte
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x8A; buffer[1] = 0x7c;								// Proximity interrupt high threshold low byte
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x8B; buffer[1] = 0x1;								// Proximity interrupt high threshold high byte
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0xF9; buffer[1] = 0xD;								// Test nine (must be set to 0x07)    이거
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0xAE; buffer[1] = 0x3F;								// Configuration six
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x82; buffer[1] = 0x1F;								// Proximity time
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x80; buffer[1] = 0x15;								// Enables states and interrupts
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0xDD; buffer[1] = 0x10;								// Interrupt enables    이거
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0xDD; buffer[1] = 0x11;								// Interrupt enables
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+	buffer[0] = 0x80; buffer[1] = 0x5;							// Enables states and interrupts
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	delay_ms(2);
+}
+
+uint16_t Prox_Sensor_Read_Offset(void) {					// read offset
+	uint8_t buffer[2] = {0xC0, 0};
+	
+	if(io_write(I2C_io, buffer, 1) < 0) {
+		i2cErrCount++;
+	}
+	if(io_read(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	
+	return ((buffer[1] << 8) | buffer[0]);
+}
+
+uint16_t Prox_Sensor_Read_Value(void) {						// read value
+	uint8_t buffer[2] = {0x9B, 0xFF};
+
+	if(io_write(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+	//if(io_read(I2C_io, buffer, 1) < 0) {
+	//	i2cErrCount++;
+	//}
+	delay_ms(2);
+	buffer[0] = 0x9C;
+	if(io_write(I2C_io, buffer, 1) < 0) {
+		i2cErrCount++;
+	}
+	if(io_read(I2C_io, buffer, 2) < 0) {
+		i2cErrCount++;
+	}
+
+	return ((buffer[1] << 8) | buffer[0]) & 0x3FFF;
+}
